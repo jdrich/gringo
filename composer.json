@@ -1,0 +1,19 @@
+{
+    "name": "jdrich/gringo",
+    "description": "A simple PHP data store interface for the filesystem",
+    "homepage": "https://github.com/jdrich/gringo",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jonathan Rich",
+            "email": "jdrich@gmail.com",
+            "homepage": "http://jonathanri.ch"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Gringo\\": "src/",
+            "Gringo\\Tests\\": "tests/"
+        }
+    }
+}
