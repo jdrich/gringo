@@ -17,6 +17,12 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
+    public function testExceptionOnInvalidStoreName() {
+        $this->setExpectedException('UnexpectedValueException');
+
+        $store = $this->getStore('!!!!invalid!!!');
+    }
+
     public function testExceptionOnInvalidRoot() {
         $this->setExpectedException('RuntimeException');
 
@@ -29,14 +35,6 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(
             file_exists($this->store_root. \DIRECTORY_SEPARATOR . 'test')
         );
-    }
-
-    public function testGetDefault() {
-
-    }
-
-    public function testCreate() {
-
     }
 
     public function testHasNext() {
@@ -52,8 +50,89 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($store->hasNext());
     }
 
-    private function getStore() {
-        return new Store('test', $this->store_root);
+    public function testCurrent() {
+        $store = $this->getStore();
+
+        $this->assertNull($store->current());
+
+        $store->create($store->getDefault());
+
+        $this->assertEquals([], $store->current());
+    }
+
+    public function testFirst() {
+        $store = $this->getStore();
+
+        $first = $store->getDefault();
+        $first['bacon'] = 'delicious';
+
+        $store->create($first);
+        $store->create($store->getDefault());
+        $store->create($store->getDefault());
+
+        $this->assertEquals($first, $store->first());
+    }
+
+    public function testLast() {
+        $store = $this->getStore();
+
+        $last = $store->getDefault();
+        $last['bacon'] = 'delicious';
+
+        $store->create($store->getDefault());
+        $store->create($store->getDefault());
+        $store->create($last);
+
+        $store->first();
+
+        $this->assertEquals($last, $store->last());
+    }
+
+    public function testGetThrowsExceptionOnBadIndex() {
+        $this->setExpectedException('RuntimeException');
+
+        $store = $this->getStore();
+        $store->get(5);
+    }
+
+    public function testGetThrowsExceptionOnInvalidIndex() {
+        $this->setExpectedException('RuntimeException');
+
+        $store = $this->getStore();
+        $store->get('vanilla');
+    }
+
+    public function testGet() {
+        $store = $this->getStore();
+
+        $this->populate($store);
+
+        $this->setExpectedException('RuntimeException');
+        $store->get('vanilla');
+
+        $store = $this->getStore();
+
+        $this->assertNull($store->get());
+
+        $store->get(20);
+    }
+
+    private function populate(Store $store) {
+        $belome = function($index) {
+            return [ 'item' => $index ];
+        };
+
+        $count = 10;
+
+        while($count < 10) {
+            $store->create($belome($count));
+
+            $count++;
+        }
+    }
+
+    private function getStore($store = 'test') {
+        return new Store($store, $this->store_root);
     }
 
     private function rmRecursive($file) {

@@ -66,19 +66,20 @@ class Store {
     }
 
     public function get($index = null) {
-        if(!ctype_digit((string)$index)) {
-            throw new \RuntimeException( 'Invalid index: ' . $index );
-        }
-
         if( $index === null ) {
             $index = $this->index;
+        }
+
+        if(!ctype_digit((string)$index)) {
+            throw new \RuntimeException( 'Invalid index: ' . $index );
         }
 
         if($index < 0) {
             return null;
         }
 
-        $json = file_get_contents( $this->getItemFilename( $index ) );
+        // The file may not exist (if the index is bad).
+        $json = @file_get_contents( $this->getItemFilename( $index ) );
 
         if( $json === false ) {
             throw new \RuntimeException( 'Could not get contents of: ' . $this->getItemFilename( $index ) );
@@ -120,7 +121,7 @@ class Store {
 
     public function save( array $data ) {
         if( $this->index < 0 ) {
-            $this->create($data);
+            return $this->create($data);
         }
 
         $json = json_encode( $data );
