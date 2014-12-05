@@ -41,7 +41,7 @@ Or backwards
     $record = $store->last();
 
     do {
-
+        // stuff
     } while($record = $store->prev());
 
 ## Purpose
